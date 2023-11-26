@@ -2,21 +2,22 @@ const express = require("express");
 const {
   register,
   login,
-  //   logout,
+  logout,
   //   getMe,
-  //   updateDetails,
+  updatePreferences,
 } = require("../controllers/auth");
+
+const { protect } = require("../middleware/middleware");
 
 const router = express.Router();
 
-// const { protect } = require("../middleware/auth");
-
 router.post("/register", register);
 router.post("/login", login);
-// router.get("/logout", logout);
+router.get("/logout", logout);
+router.put("/updatedetails", protect, updatePreferences);
+
 // router.get("/me", protect, getMe);
 // router.get("/confirmemail", confirmEmail);
-// router.put("/updatedetails", protect, updateDetails);
 // router.put("/updatepassword", protect, updatePassword);
 // router.post("/forgotpassword", forgotPassword);
 // router.put("/resetpassword/:resettoken", resetPassword);
