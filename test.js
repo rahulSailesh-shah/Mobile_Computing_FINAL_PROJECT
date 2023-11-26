@@ -1,19 +1,24 @@
-// function greet() {
-//   console.log(`${this.name} -- ${this.age}`);
-// }
+const { TextServiceClient } = require("@google-ai/generativelanguage").v1beta2;
 
-// var obj = { name: "Rahul", age: 25 };
-// const boundGreet = greet.bind(obj);
-// boundGreet();
+const { GoogleAuth } = require("google-auth-library");
+const basePrompt = require("./prompt");
 
-function callback() {
-  console.log("Callback fn");
-}
+const MODEL_NAME = "models/text-bison-001";
+const API_KEY = "AIzaSyC43be-sFpM65Aj3mtpMuWlcVGMsVnLI8c";
 
-function test(opr) {
-  console.log("ffff");
+const client = new TextServiceClient({
+  authClient: new GoogleAuth().fromAPIKey(API_KEY),
+});
 
-  opr();
-}
+const prompt = "Repeat after me: one, two,";
 
-test(callback);
+client
+  .generateText({
+    model: MODEL_NAME,
+    prompt: {
+      text: basePrompt(),
+    },
+  })
+  .then((result) => {
+    console.log(result[0].candidates[0].output);
+  });
