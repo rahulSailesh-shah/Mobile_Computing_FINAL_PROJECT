@@ -3,7 +3,7 @@ const {
   register,
   login,
   logout,
-  //   getMe,
+  getMe,
   updatePreferences,
 } = require("../controllers/auth");
 
@@ -15,11 +15,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
 router.put("/updatedetails", protect, updatePreferences);
-
-// router.get("/me", protect, getMe);
-// router.get("/confirmemail", confirmEmail);
-// router.put("/updatepassword", protect, updatePassword);
-// router.post("/forgotpassword", forgotPassword);
-// router.put("/resetpassword/:resettoken", resetPassword);
+router.get("/me", protect, getMe);
 
 module.exports = router;

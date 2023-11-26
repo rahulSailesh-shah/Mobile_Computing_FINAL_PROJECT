@@ -88,9 +88,28 @@ exports.updatePreferences = async (req, res, next) => {
       photoURL: userRef._fieldsProto.photoURL.stringValue,
       preferences: userPref,
     };
+    res.status(200).json({ success: true, data: userData });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorResponse("Internal Server Error", 500));
+  }
+};
 
-    const token = getSignedJwtToken(uid);
-    res.status(200).json({ success: true, token, data: userData });
+exports.getMe = async (req, res, next) => {
+  try {
+    const db = admin.firestore();
+    const uid = req.uid;
+
+    const userRef = await db.collection("users").doc(uid).get();
+    const userPref = userRef._fieldsProto.preferences.arrayValue.values;
+
+    const userData = {
+      name: userRef._fieldsProto.name.stringValue,
+      email: userRef._fieldsProto.email.stringValue,
+      photoURL: userRef._fieldsProto.photoURL.stringValue,
+      preferences: userPref,
+    };
+    res.status(200).json({ success: true, data: userData });
   } catch (error) {
     console.log(error);
     return next(new ErrorResponse("Internal Server Error", 500));
