@@ -7,8 +7,22 @@ const basePrompt = require("../utilities/prompt");
 
 exports.getEvents = async (req, res, next) => {
   try {
-    res.json({ data: [] });
-  } catch (error) {}
+    const db = admin.firestore();
+    const eventsRef = db.collection("events");
+    eventsRef.get().then((querySnapshot) => {
+      const documents = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      res.status(200).json({ success: true, data: documents });
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorResponse("Internal Server Error", 500));
+  }
 };
 
 exports.getEvent = async (req, res, next) => {
