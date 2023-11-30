@@ -27,8 +27,19 @@ exports.getEvents = async (req, res, next) => {
 
 exports.getEvent = async (req, res, next) => {
   try {
-    res.json({ data: [] });
-  } catch (error) {}
+    const db = admin.firestore();
+    const eventsRef = db.collection("events").doc(req.params.id);
+    eventsRef.get().then((doc) => {
+      if (doc.exists) {
+        res.json({ success: true, id: doc.id, data: doc.data() });
+      } else {
+        res.status(404).json({ error: "Document not found" });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorResponse("Internal Server Error", 500));
+  }
 };
 
 exports.seedEvents = async (req, res, next) => {
