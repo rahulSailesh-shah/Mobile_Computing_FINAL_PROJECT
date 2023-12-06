@@ -47,6 +47,8 @@ const basePrompt = (preference) => {
         "Event Type": "Concert",
         "Event Date": "2023-12-03",
         "Event Time": "8:00 PM",
+        "Latitude": "1123.8383",
+        "Longitude": "1123.8383",
         "Event Location": "The Marquee Theatre",
         "Event Name": "My Chemical Romance",
         "Additional Details": {

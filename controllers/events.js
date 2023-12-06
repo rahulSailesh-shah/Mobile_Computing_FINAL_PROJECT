@@ -63,13 +63,15 @@ exports.seedEvents = async (req, res, next) => {
     var events = await Promise.all(eventsPromises);
     events = events.flat();
 
-    await Promise.all(
-      events.map(async (event) => {
-        await db.collection("events").add(event);
-      })
-    );
+    const formatEvents = await formatEventData(events);
 
-    res.status(200).json({ success: true, data: events });
+    // await Promise.all(
+    //   events.map(async (event) => {
+    //     await db.collection("events").add(event);
+    //   })
+    // );
+
+    res.status(200).json({ success: true, data: formatEvents });
   } catch (error) {
     console.log(error);
     return next(new ErrorResponse("Internal Server Error", 500));
@@ -101,4 +103,62 @@ const getUserPreferenceEvents = async (preference) => {
     output = output.replace(/\s*```$/, "");
   }
   return JSON.parse(output);
+};
+
+const formatEventData = async (events) => {
+  const formattedEvents = events.map(async (d) => {
+    d["eventType"] = d["Event Type"];
+    delete d["Event Type"];
+
+    d["eventDate"] = d["Event Date"];
+    delete d["Event Date"];
+
+    d["eventLocationName"] = d["Event Location"];
+    delete d["Event Location"];
+
+    d["eventName"] = d["Event Name"];
+    delete d["Event Name"];
+
+    d["eventTime"] = d["Event Time"];
+    delete d["Event Time"];
+
+    d["additionalDetails"] = d["Additional Details"];
+    d["additionalDetails"]["cost"] = d["Additional Details"]["Cost"];
+    d["additionalDetails"]["bookingLink"] =
+      d["Additional Details"]["Booking Link"];
+    delete d["additionalDetails"]["Cost"];
+    delete d["additionalDetails"]["Booking Link"];
+    delete d["Additional Details"];
+
+    const locationName = d["eventLocationName"];
+    const apiKey = "AIzaSyCfnti-be6CQmPg6y4OkGxwxt4NstHl0L8";
+    const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+      locationName
+    )}&key=${apiKey}`;
+
+    let coordinates = {};
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      coordinates = {
+        lat: location.lat,
+        lng: location.lng,
+      };
+    } else {
+      coordinates = {
+        lat: null,
+        lng: null,
+      };
+    }
+    d["eventLocation"] = {
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
+    };
+
+    return d;
+  });
+
+  return await Promise.all(formattedEvents);
 };
