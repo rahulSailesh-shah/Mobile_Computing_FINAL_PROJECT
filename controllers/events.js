@@ -65,11 +65,11 @@ exports.seedEvents = async (req, res, next) => {
 
     const formatEvents = await formatEventData(events);
 
-    // await Promise.all(
-    //   events.map(async (event) => {
-    //     await db.collection("events").add(event);
-    //   })
-    // );
+    await Promise.all(
+      formatEvents.map(async (event) => {
+        await db.collection("events").add(event);
+      })
+    );
 
     res.status(200).json({ success: true, data: formatEvents });
   } catch (error) {
@@ -131,7 +131,7 @@ const formatEventData = async (events) => {
     delete d["Additional Details"];
 
     const locationName = d["eventLocationName"];
-    const apiKey = "AIzaSyCfnti-be6CQmPg6y4OkGxwxt4NstHl0L8";
+    const apiKey = process.env.MAPS_KEY;
     const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
       locationName
     )}&key=${apiKey}`;
